@@ -34,7 +34,7 @@ const getUsers = async (req, res, next) => {
 	try {
 		let allUsers = await User.find();
 		res.status(200).send({ success: true, data: allUsers });
-	} catch {
+	} catch (error) {
 		res.status(400).send({ success: false, data: 'Something went wrong' });
 	}
 };
@@ -54,9 +54,9 @@ const getUserProfile = async (req, res, next) => {
 	}
 };
 
-const updateUserById = async (req, res, next) => {
+const updateUser = async (req, res, next) => {
 	try {
-		const { id } = req.params;
+		const { id } = req.user;
 		const { username, password, email, displayName } = req.body;
 		let user = await User.findById(id);
 		let userToUpdate = await User.findByIdAndUpdate(
@@ -74,14 +74,14 @@ const updateUserById = async (req, res, next) => {
 		} else {
 			throw new Error('User does not exist.');
 		}
-	} catch {
-		res.status(404).send({ success: false, data: 'Could not update' });
+	} catch (error) {
+		next({status: 400, message: error.message})
 	}
 };
 
-const deleteUserById = async (req, res, next) => {
+const deleteUser = async (req, res, next) => {
 	try {
-		const { id } = req.params;
+		const { id } = req.user;
 		let userToDelete = await User.findById(id);
 		if (userToDelete != null) {
 			await User.findByIdAndDelete(id);
@@ -89,8 +89,8 @@ const deleteUserById = async (req, res, next) => {
 		} else {
 			throw new Error('User does not exist.');
 		}
-	} catch {
-		res.status(400).send({ success: false, data: 'Could not delete' });
+	} catch (error) {
+		next({status: 400, message: error.message})
 	}
 };
 
@@ -114,7 +114,7 @@ const loginUser = async (req, res, next) => {
 
 		return res.send(token);
 	} catch (error) {
-		res.status(400).send({ success: false, data: 'Could not delete' });
+		next({status: 400, message: error.message})
 	}
 };
 
@@ -122,7 +122,7 @@ module.exports = {
 	addUser,
 	getUsers,
 	getUserProfile,
-	updateUserById,
-	deleteUserById,
+	updateUser,
+	deleteUser,
 	loginUser,
 };
