@@ -1,5 +1,6 @@
 // Environment Variables
 require('dotenv').config();
+const userRouter = require('./routes/User.routes');
 
 // Imports
 const express = require('express');
@@ -17,15 +18,25 @@ app.use(cors());
 app.use(morgan('tiny'));
 
 // Database
-connectDB();
+if (process.env.NODE_ENV !== 'test') {
+	connectDB();
+}
 
 // Routing
-// app.use('/api/users', userRouter);
+app.use('/api/users', userRouter);
 
 app.get('/healthcheck', (req, res) => {
 	res.send('API IS RUNNING');
 });
 
-app.use(errorHandler);
-
+// Error Handler
+// app.use(errorHandler);
+app.use((err, req, res, next) => {
+	if (err.status && err.message) {
+		// console.log('e', err);
+		res.status(err.status).send({ message: err.message });
+	} else {
+		next(err);
+	}
+});
 module.exports = app;
