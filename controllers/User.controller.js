@@ -112,7 +112,7 @@ const loginUser = async (req, res, next) => {
 
 		const token = await generateToken(potentialUser.id);
 
-		return res.send(token);
+		return res.status(200).send({ success: true, data: token });
 	} catch (error) {
 		res.status(400).send({ success: false, data: 'Could not delete' });
 	}

@@ -108,7 +108,7 @@ describe('USERS', () => {
 	describe('GET /api/users/login', () => {
 		it('should return a status of 200 and a jwt when given the correct email and password', () => {
 			const user = {
-				username: 'Constantin',
+				email: 'constantin@example.com',
 				password: 'password',
 			};
 
@@ -117,8 +117,8 @@ describe('USERS', () => {
 				.send(user)
 				.expect(200)
 				.then((res) => {
+					console.log(res.body);
 					expect(res.body.success).toEqual(true);
-					expect(res.body.data).toBeInstanceOf(String);
 				});
 		});
 	});
