@@ -26,7 +26,7 @@ const addUser = async (req, res, next) => {
 		let savedUser = await User.create(newUser);
 		res.status(201).send({ success: true, data: savedUser });
 	} catch (error) {
-		res.status(status).send({ success: false, data: error.message });
+		next({ status: 400, message: error.message });
 	}
 };
 
@@ -35,7 +35,7 @@ const getUsers = async (req, res, next) => {
 		let allUsers = await User.find();
 		res.status(200).send({ success: true, data: allUsers });
 	} catch (error) {
-		res.status(400).send({ success: false, data: 'Something went wrong' });
+		next({ status: 400, message: error.message });
 	}
 };
 
@@ -50,7 +50,6 @@ const getUserProfile = async (req, res, next) => {
 		}
 	} catch (error) {
 		next({ status: 404, message: error.message });
-		// res.status(404).send({ success: false, data: 'User not found' });
 	}
 };
 
@@ -75,7 +74,7 @@ const updateUser = async (req, res, next) => {
 			throw new Error('User does not exist.');
 		}
 	} catch (error) {
-		next({status: 400, message: error.message})
+		next({ status: 400, message: error.message });
 	}
 };
 
@@ -90,7 +89,7 @@ const deleteUser = async (req, res, next) => {
 			throw new Error('User does not exist.');
 		}
 	} catch (error) {
-		next({status: 400, message: error.message})
+		next({ status: 400, message: error.message });
 	}
 };
 
@@ -114,7 +113,7 @@ const loginUser = async (req, res, next) => {
 
 		return res.status(200).send({ success: true, data: token });
 	} catch (error) {
-		next({status: 400, message: error.message})
+		next({ status: 401, message: error.message });
 	}
 };
 

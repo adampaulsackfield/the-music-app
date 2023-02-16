@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -10,5 +11,7 @@ const userSchema = new Schema({
 	//friends: [{usernames: String}], //don't know if this is right
 	//playlists: [{playlists: String}] // probably have to make a specific class/ objectID?
 });
+
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('User', userSchema); // I'm trying

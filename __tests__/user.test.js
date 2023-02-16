@@ -75,12 +75,12 @@ describe('USERS', () => {
 			return request(app)
 				.post(ENDPOINT)
 				.send(user)
-				.expect(500)
+				.expect(400)
 				.then((res) => {
 					expect(res.body.success).toEqual(false);
 					expect(res.body.data).toEqual(
-						'E11000 duplicate key error collection: music-app-test.users index: email_1 dup key: { email: "constantin@example.com" }'
-					); // TODO ! FIX
+						`User validation failed: email: Error, expected \`email\` to be unique. Value: \`${user.email}\``
+					);
 				});
 		});
 
@@ -95,17 +95,17 @@ describe('USERS', () => {
 			return request(app)
 				.post(ENDPOINT)
 				.send(user)
-				.expect(500)
+				.expect(400)
 				.then((res) => {
 					expect(res.body.success).toEqual(false);
 					expect(res.body.data).toEqual(
-						'E11000 duplicate key error collection: music-app-test.users index: username_1 dup key: { username: "Constantin" }'
+						`User validation failed: username: Error, expected \`username\` to be unique. Value: \`${user.username}\``
 					);
-				}); // TODO ! FIX
+				});
 		});
 	});
 
-	describe('GET /api/users/login', () => {
+	describe('POST /api/users/login', () => {
 		it('should return a status of 200 and a jwt when given the correct email and password', () => {
 			const user = {
 				email: 'constantin@example.com',
@@ -117,8 +117,109 @@ describe('USERS', () => {
 				.send(user)
 				.expect(200)
 				.then((res) => {
-					console.log(res.body);
 					expect(res.body.success).toEqual(true);
+				});
+		});
+
+		it('should should return a status of 401 and given the incorrect password', () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password2',
+			};
+
+			return request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user)
+				.expect(401)
+				.then((res) => {
+					expect(res.body.success).toEqual(false);
+					expect(res.body.data).toEqual('Invalid login credentials');
+				});
+		});
+
+		it('should should return a status of 401 and given the incorrect email address', () => {
+			const user = {
+				email: 'constantin11@example.com',
+				password: 'password',
+			};
+
+			return request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user)
+				.expect(401)
+				.then((res) => {
+					expect(res.body.success).toEqual(false);
+					expect(res.body.data).toEqual('Invalid login credentials');
+				});
+		});
+	});
+
+	describe('GET /api/users/profile', () => {
+		it('should return a status code of 200 and the users profile when presented with a valid JWT', async () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password',
+			};
+
+			const loginResponse = await request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user);
+			const userToken = loginResponse.body.data;
+
+			return request(app)
+				.get(`${ENDPOINT}/profile`)
+				.set('Authorization', `Bearer ${userToken}`)
+				.expect(200)
+				.then((res) => {
+					expect(res.body.success).toEqual(true);
+					expect(res.body.data.email).toEqual(user.email);
+					expect(res.body.data.displayName).toEqual('Constantin Coica');
+					expect(res.body.data.username).toEqual('Constantin');
+					expect(res.body.data.password).toBe(undefined);
+				});
+		});
+
+		it('should return a status code of 401 when not provided with a JWT', async () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password',
+			};
+
+			// const loginResponse = await request(app)
+			// 	.post(`${ENDPOINT}/login`)
+			// 	.send(user);
+			// const userToken = loginResponse.body.data;
+
+			return (
+				request(app)
+					.get(`${ENDPOINT}/profile`)
+					// .set('Authorization', `Bearer ${userToken}`)
+					.expect(401)
+					.then((res) => {
+						expect(res.body.success).toEqual(false);
+						expect(res.body.data).toEqual('Not authorized. No token');
+					})
+			);
+		});
+
+		it('should return a status code of 401 when not provided with an invalid JWT', async () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password',
+			};
+
+			const loginResponse = await request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user);
+			const userToken = loginResponse.body.data;
+
+			return request(app)
+				.get(`${ENDPOINT}/profile`)
+				.set('Authorization', `Bearer ${userToken}s`)
+				.expect(401)
+				.then((res) => {
+					expect(res.body.success).toEqual(false);
+					expect(res.body.data).toEqual('Not authorized');
 				});
 		});
 	});
