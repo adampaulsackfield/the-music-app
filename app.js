@@ -33,8 +33,7 @@ app.get('/healthcheck', (req, res) => {
 // app.use(errorHandler);
 app.use((err, req, res, next) => {
 	if (err.status && err.message) {
-		// console.log('e', err);
-		res.status(err.status).send({ message: err.message });
+		res.status(err.status).send({ success: false, data: err.message });
 	} else {
 		next(err);
 	}

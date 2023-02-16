@@ -16,11 +16,11 @@ const protectedRoute = async (req, res, next) => {
 
 			next();
 		} catch (err) {
-			next({ status: 401, data: 'Not authorised' });
+			next({ status: 401, message: 'Not authorized' });
 		}
 	}
 	if (!token) {
-		next({ status: 401, data: 'Not authorised. No token' });
+		next({ status: 401, message: 'Not authorized. No token' });
 	}
 };
 
