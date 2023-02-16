@@ -8,8 +8,6 @@ const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./database/connection');
 
-const errorHandler = require('./middleware/error-handler.middleware');
-
 const app = express();
 
 // Middleware
@@ -30,7 +28,6 @@ app.get('/healthcheck', (req, res) => {
 });
 
 // Error Handler
-// app.use(errorHandler);
 app.use((err, req, res, next) => {
 	if (err.status && err.message) {
 		res.status(err.status).send({ success: false, data: err.message });
@@ -38,4 +35,5 @@ app.use((err, req, res, next) => {
 		next(err);
 	}
 });
+
 module.exports = app;

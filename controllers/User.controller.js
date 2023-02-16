@@ -3,10 +3,11 @@ const generateToken = require('../helpers/generate-jwt');
 const hashPassword = require('../helpers/hash-password');
 const User = require('../models/User.model');
 
-const addUser = async (req, res, next) => {
-	let status = 500;
-	let message = 'Internal Server Error';
-
+// METHOD    - POST
+// ENDPOINT  - /api/users
+// BODY      - { username, displayName, email, password }
+// PROTECTED - false
+const createUser = async (req, res, next) => {
 	try {
 		if (
 			!req.body.username ||
@@ -14,9 +15,7 @@ const addUser = async (req, res, next) => {
 			!req.body.email ||
 			!req.body.password
 		) {
-			status = 400;
-			message = 'Missing required fields';
-			throw new Error(message);
+			throw new Error('Missing required fields');
 		}
 
 		let newUser = req.body;
@@ -24,75 +23,16 @@ const addUser = async (req, res, next) => {
 		newUser.password = await hashPassword(newUser.password);
 
 		let savedUser = await User.create(newUser);
+
 		res.status(201).send({ success: true, data: savedUser });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
 };
 
-const getUsers = async (req, res, next) => {
-	try {
-		let allUsers = await User.find();
-		res.status(200).send({ success: true, data: allUsers });
-	} catch (error) {
-		next({ status: 400, message: error.message });
-	}
-};
-
-const getUserProfile = async (req, res, next) => {
-	try {
-		const { id } = req.user;
-		let userToSend = await User.findById(id);
-		if (userToSend != null) {
-			res.status(200).send({ success: true, data: userToSend });
-		} else {
-			throw new Error('User does not exist.');
-		}
-	} catch (error) {
-		next({ status: 404, message: error.message });
-	}
-};
-
-const updateUser = async (req, res, next) => {
-	try {
-		const { id } = req.user;
-		const { username, password, email, displayName } = req.body;
-		let user = await User.findById(id);
-		let userToUpdate = await User.findByIdAndUpdate(
-			id,
-			{
-				username: username == null ? user.id : username,
-				password: password == null ? user.password : password,
-				email: email == null ? user.email : email,
-				displayname: displayName == null ? user.displayName : displayName,
-			},
-			{ returnOriginal: false }
-		);
-		if (userToUpdate != null) {
-			res.status(200).send({ success: true, data: userToUpdate });
-		} else {
-			throw new Error('User does not exist.');
-		}
-	} catch (error) {
-		next({ status: 400, message: error.message });
-	}
-};
-
-const deleteUser = async (req, res, next) => {
-	try {
-		const { id } = req.user;
-		let userToDelete = await User.findById(id);
-		if (userToDelete != null) {
-			await User.findByIdAndDelete(id);
-			res.status(200).send({ success: true, data: userToDelete });
-		} else {
-			throw new Error('User does not exist.');
-		}
-	} catch (error) {
-		next({ status: 400, message: error.message });
-	}
-};
-
+// METHOD    - POST
+// ENDPOINT  - /api/users/login
+// BODY      - { email, password }
 const loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
@@ -109,7 +49,7 @@ const loginUser = async (req, res, next) => {
 			throw new Error('Invalid login credentials');
 		}
 
-		const token = await generateToken(potentialUser.id);
+		const token = await generateToken(potentialUser.id); // TODO - Possibly check for token creation failure and send back message
 
 		return res.status(200).send({ success: true, data: token });
 	} catch (error) {
@@ -117,8 +57,94 @@ const loginUser = async (req, res, next) => {
 	}
 };
 
+// METHOD    - GET
+// ENDPOINT  - /api/users
+// PROTECTED - false
+// TODO Should this be protected
+const getUsers = async (req, res, next) => {
+	try {
+		let allUsers = await User.find();
+		res.status(200).send({ success: true, data: allUsers });
+	} catch (error) {
+		next({ status: 400, message: error.message });
+	}
+};
+
+// METHOD    - GET
+// ENDPOINT  - /api/users/profile
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PROTECTED - true
+const getUserProfile = async (req, res, next) => {
+	try {
+		const { id } = req.user;
+		const userToSend = await User.findById(id);
+
+		if (!userToSend) {
+			throw new Error('User does not exist.');
+		}
+
+		res.status(200).send({ success: true, data: userToSend });
+	} catch (error) {
+		next({ status: 404, message: error.message });
+	}
+};
+
+// METHOD    - PUT
+// ENDPOINT  - /api/users/profile
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// BODY      - { username, displayName, email, password}
+// PROTECTED - true
+const updateUser = async (req, res, next) => {
+	try {
+		const { id } = req.user;
+		const { username, password, email, displayName } = req.body;
+
+		const user = await User.findById(id);
+
+		// TODO - Confirm password when updating, using compare function
+		const updatedUser = {
+			username: username == null ? user.username : username,
+			email: email == null ? user.email : email,
+			displayname: displayName == null ? user.displayName : displayName,
+			password: password == null ? user.password : password,
+		};
+
+		const userToUpdate = await User.findByIdAndUpdate(id, updatedUser, {
+			returnOriginal: false,
+		});
+
+		if (!userToUpdate) {
+			throw new Error('User does not exist.');
+		}
+
+		res.status(200).send({ success: true, data: userToUpdate });
+	} catch (error) {
+		next({ status: 400, message: error.message });
+	}
+};
+
+// METHOD    - DELETE
+// ENDPOINT  - /api/users/profile
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PROTECTED - true
+const deleteUser = async (req, res, next) => {
+	try {
+		const { id } = req.user;
+
+		let userToDelete = await User.findByIdAndDelete(id);
+
+		if (!userToDelete) {
+			throw new Error('User does not exist.');
+		}
+
+		res.status(200).send({ success: true, data: userToDelete });
+	} catch (error) {
+		next({ status: 400, message: error.message });
+	}
+};
+
 module.exports = {
-	addUser,
+	createUser,
 	getUsers,
 	getUserProfile,
 	updateUser,
