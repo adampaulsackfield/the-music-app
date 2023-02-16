@@ -48,8 +48,9 @@ const getUserProfile = async (req, res, next) => {
 		} else {
 			throw new Error('User does not exist.');
 		}
-	} catch {
-		res.status(404).send({ success: false, data: 'User not found' });
+	} catch (error) {
+		next({ status: 404, message: error.message });
+		// res.status(404).send({ success: false, data: 'User not found' });
 	}
 };
 
