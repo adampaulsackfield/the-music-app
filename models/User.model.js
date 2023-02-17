@@ -7,9 +7,10 @@ const userSchema = new Schema({
 	email: { type: String, required: true, unique: true },
 	displayName: { type: String, required: true },
 	password: { type: String, required: true, select: false },
+	follows: [{type: Schema.Types.ObjectId, ref: "Followers"}],
 });
 
 userSchema.plugin(uniqueValidator);
 
 // TODO - Add min max to password, username
-module.exports = mongoose.model('User', userSchema); // I'm trying
+module.exports = mongoose.model('User', userSchema); 
