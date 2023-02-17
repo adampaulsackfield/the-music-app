@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./database/connection');
+const followRouter = require('./routes/Follow.routes');
 
 const app = express();
 
@@ -20,8 +21,11 @@ if (process.env.NODE_ENV !== 'test') {
 	connectDB();
 }
 
-// Routing
+// Routing User
 app.use('/api/users', userRouter);
+
+// Routing Follow
+app.use('/api/follow', followRouter);
 
 app.get('/healthcheck', (req, res) => {
 	res.send('API IS RUNNING');

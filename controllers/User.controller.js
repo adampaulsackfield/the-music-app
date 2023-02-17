@@ -77,7 +77,19 @@ const getUsers = async (req, res, next) => {
 const getUserProfile = async (req, res, next) => {
 	try {
 		const { id } = req.user;
-		const userToSend = await User.findById(id);
+		const userToSend = await User.findById(id)
+		.populate({
+		 path: 'follows',
+		 populate: {
+			path: "requestee",
+			model: "User"
+		}})
+		.populate({path: 'follows',
+		populate:{
+			path: 'requester',
+			model: "User"
+		}});
+		
 
 		if (!userToSend) {
 			throw new Error('User does not exist.');
