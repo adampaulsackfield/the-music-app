@@ -78,8 +78,8 @@ const getUserProfile = async (req, res, next) => {
 	try {
 		const { id } = req.user;
 		const userToSend = await User.findById(id)
-		.populate('followers', 'displayName').populate('following', 'displayName');
-		
+			.populate('followers', 'displayName')
+			.populate('following', 'displayName');
 
 		if (!userToSend) {
 			throw new Error('User does not exist.');
@@ -99,20 +99,10 @@ const getUserProfile = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
 	try {
 		const { id } = req.user;
-		const { username, password, email, displayName } = req.body;
-
-		const user = await User.findById(id);
 
 		// TODO - Confirm password when updating, using compare function
-		const updatedUser = {
-			username: username == null ? user.username : username,
-			email: email == null ? user.email : email,
-			displayname: displayName == null ? user.displayName : displayName,
-			password: password == null ? user.password : password,
-		};
-
-		const userToUpdate = await User.findByIdAndUpdate(id, updatedUser, {
-			returnOriginal: false,
+		const userToUpdate = await User.findByIdAndUpdate(id, req.body, {
+			new: true,
 		});
 
 		if (!userToUpdate) {
@@ -139,38 +129,78 @@ const deleteUser = async (req, res, next) => {
 			throw new Error('User does not exist.');
 		}
 
-		res.status(200).send({ success: true, data: userToDelete });
+		res
+			.status(200)
+			.send({
+				success: true,
+				data: `${userToDelete.displayName}'s account has successfully been deleted.`,
+			});
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
 };
 
-const followUser = async(req, res, next) =>{
-	try{
+// METHOD    - GET
+// ENDPOINT  - /api/users/:id/follow
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PARAMS    - :id -> User ObjectID
+// PROTECTED - true
+const followUser = async (req, res, next) => {
+	try {
 		const followerID = req.user.id;
 		const followingID = req.params.id;
-		
-		const follower = await User.findByIdAndUpdate(followerID, {$addToSet: {following: followingID}});
-		const followee = await User.findByIdAndUpdate(followingID, {$addToSet:{followers: followerID}});
-		res.status(200).send({success: true, data: {follower, followee}});
 
-	} catch (error){
-		next({status: 400, message: error.message});
+		const follower = await User.findByIdAndUpdate(followerID, {
+			$addToSet: { following: followingID },
+		});
+
+		const followee = await User.findByIdAndUpdate(followingID, {
+			$addToSet: { followers: followerID },
+		});
+
+		if (!follower || !followee) {
+			throw new Error('Something went wrong with the follow request');
+		}
+
+		res.status(200).send({
+			success: true,
+			data: `${followee.displayName} has been followed`,
+		});
+	} catch (error) {
+		next({ status: 400, message: error.message });
 	}
-}
+};
 
-const unfollowUser = async(req, res, next) =>{
-	try{
+// METHOD    - GET
+// ENDPOINT  - /api/users/:id/unfollow
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PARAMS    - :id -> User ObjectID
+// PROTECTED - true
+const unfollowUser = async (req, res, next) => {
+	try {
 		const unfollowerID = req.user.id;
 		const unfollowingID = req.params.id;
-		
-		const unfollower = await User.findByIdAndUpdate(unfollowerID, {$pull:{following: unfollowingID}});
-		const unfollowee = await User.findByIdAndUpdate(unfollowingID, {$pull:{followers: unfollowerID}});
-		res.status(200).send({success: true, data: `${unfollowee.displayName} has been unfollowed`});
-	} catch (error){
-		next({status: 400, message: error.message});
+
+		const unfollower = await User.findByIdAndUpdate(unfollowerID, {
+			$pull: { following: unfollowingID },
+		});
+
+		const unfollowee = await User.findByIdAndUpdate(unfollowingID, {
+			$pull: { followers: unfollowerID },
+		});
+
+		if (!unfollower || !unfollowee) {
+			throw new Error('Something went wrong with the unfollow request');
+		}
+
+		res.status(200).send({
+			success: true,
+			data: `${unfollowee.displayName} has been unfollowed`,
+		});
+	} catch (error) {
+		next({ status: 400, message: error.message });
 	}
-}
+};
 
 module.exports = {
 	createUser,
@@ -180,5 +210,5 @@ module.exports = {
 	deleteUser,
 	loginUser,
 	followUser,
-	unfollowUser
+	unfollowUser,
 };
