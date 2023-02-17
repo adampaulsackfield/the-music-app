@@ -78,17 +78,7 @@ const getUserProfile = async (req, res, next) => {
 	try {
 		const { id } = req.user;
 		const userToSend = await User.findById(id)
-		.populate({
-		 path: 'follows',
-		 populate: {
-			path: "requestee",
-			model: "User"
-		}})
-		.populate({path: 'follows',
-		populate:{
-			path: 'requester',
-			model: "User"
-		}});
+		.populate('followers', 'displayName').populate('following', 'displayName');
 		
 
 		if (!userToSend) {
@@ -155,6 +145,33 @@ const deleteUser = async (req, res, next) => {
 	}
 };
 
+const followUser = async(req, res, next) =>{
+	try{
+		const followerID = req.user.id;
+		const followingID = req.params.id;
+		
+		const follower = await User.findByIdAndUpdate(followerID, {$addToSet: {following: followingID}});
+		const followee = await User.findByIdAndUpdate(followingID, {$addToSet:{followers: followerID}});
+		res.status(200).send({success: true, data: {follower, followee}});
+
+	} catch (error){
+		next({status: 400, message: error.message});
+	}
+}
+
+const unfollowUser = async(req, res, next) =>{
+	try{
+		const unfollowerID = req.user.id;
+		const unfollowingID = req.params.id;
+		
+		const unfollower = await User.findByIdAndUpdate(unfollowerID, {$pull:{following: unfollowingID}});
+		const unfollowee = await User.findByIdAndUpdate(unfollowingID, {$pull:{followers: unfollowerID}});
+		res.status(200).send({success: true, data: `${unfollowee.displayName} has been unfollowed`});
+	} catch (error){
+		next({status: 400, message: error.message});
+	}
+}
+
 module.exports = {
 	createUser,
 	getUsers,
@@ -162,4 +179,6 @@ module.exports = {
 	updateUser,
 	deleteUser,
 	loginUser,
+	followUser,
+	unfollowUser
 };

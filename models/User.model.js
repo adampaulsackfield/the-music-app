@@ -7,7 +7,8 @@ const userSchema = new Schema({
 	email: { type: String, required: true, unique: true },
 	displayName: { type: String, required: true },
 	password: { type: String, required: true, select: false },
-	follows: [{type: Schema.Types.ObjectId, ref: "Followers"}],
+	followers: [{type: Schema.Types.ObjectId, ref: "User"}],
+	following: [{type: Schema.Types.ObjectId, ref: "User"}]
 });
 
 userSchema.plugin(uniqueValidator);
