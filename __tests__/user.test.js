@@ -352,7 +352,9 @@ describe('USERS', () => {
 				.expect(400)
 				.then((res) => {
 					expect(res.body.success).toBe(false);
-					expect(res.body.data).toEqual('Incorrect password');
+					expect(res.body.data).toEqual(
+						'Validation failed, unable to update user'
+					);
 				});
 		});
 
@@ -385,11 +387,35 @@ describe('USERS', () => {
 			return request(app)
 				.delete(`${ENDPOINT}/profile`)
 				.set('Authorization', `Bearer ${loginResponse.body.data}`)
+				.send({ password: 'password' })
 				.expect(200)
 				.then((res) => {
 					expect(res.body.success).toBe(true);
 					expect(res.body.data).toEqual(
 						"Constantin Coica's account has successfully been deleted."
+					);
+				});
+		});
+
+		it('should return a status code of 400 when the password is incorrect', async () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password',
+			};
+
+			const loginResponse = await request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user);
+
+			return request(app)
+				.delete(`${ENDPOINT}/profile`)
+				.set('Authorization', `Bearer ${loginResponse.body.data}`)
+				.send({ password: 'password1' })
+				.expect(400)
+				.then((res) => {
+					expect(res.body.success).toBe(false);
+					expect(res.body.data).toEqual(
+						'Validation failed, unable to delete user'
 					);
 				});
 		});

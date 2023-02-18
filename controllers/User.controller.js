@@ -1,7 +1,29 @@
+// Helpers
 const comparePassword = require('../helpers/compare-password');
 const generateToken = require('../helpers/generate-jwt');
 const hashPassword = require('../helpers/hash-password');
+
+// Models
 const User = require('../models/User.model');
+
+// Validate Password Helper
+const validatePassword = async (userId, candidatePassword) => {
+	// Find User By ID - So we can get the password to compare
+	const user = await User.findById(userId).select('+password');
+
+	if (!user) {
+		return false;
+	}
+
+	// Verify Password
+	const isValid = await comparePassword(candidatePassword, user.password);
+
+	if (!isValid) {
+		return false;
+	}
+
+	return true;
+};
 
 // METHOD    - POST
 // ENDPOINT  - /api/users
@@ -17,13 +39,14 @@ const createUser = async (req, res, next) => {
 			throw new Error('Missing required fields');
 		}
 
-		let newUser = req.body;
+		let user = req.body;
 
-		newUser.password = await hashPassword(newUser.password);
+		// Hash Password
+		user.password = await hashPassword(user.password);
 
-		let savedUser = await User.create(newUser);
+		const savedUser = await User.create(user);
 
-		res.status(201).send({ success: true, data: savedUser });
+		return res.status(201).send({ success: true, data: savedUser });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -36,19 +59,22 @@ const loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 
-		const potentialUser = await User.findOne({ email }).select('+password');
+		// Find User By Email - Need to select the password, as it doesn't return by default
+		const user = await User.findOne({ email }).select('+password');
 
-		if (!potentialUser) {
+		if (!user) {
 			throw new Error('Invalid login credentials');
 		}
 
-		const isValid = await comparePassword(password, potentialUser.password);
+		// Verify Password
+		const isValid = await comparePassword(password, user.password);
 
 		if (!isValid) {
 			throw new Error('Invalid login credentials');
 		}
 
-		const token = await generateToken(potentialUser.id);
+		// Generate JWT
+		const token = await generateToken(user.id);
 
 		return res.status(200).send({ success: true, data: token });
 	} catch (error) {
@@ -61,8 +87,9 @@ const loginUser = async (req, res, next) => {
 // TODO Should this be protected
 const getUsers = async (req, res, next) => {
 	try {
-		const allUsers = await User.find();
-		res.status(200).send({ success: true, data: allUsers });
+		const users = await User.find();
+
+		return res.status(200).send({ success: true, data: users });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -81,7 +108,7 @@ const getUserById = async (req, res, next) => {
 			throw new Error('User not found');
 		}
 
-		res.status(200).send({ success: true, data: user });
+		return res.status(200).send({ success: true, data: user });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -93,16 +120,19 @@ const getUserById = async (req, res, next) => {
 // PROTECTED - true
 const getUserProfile = async (req, res, next) => {
 	try {
+		// User ID will be in the req if the user is authenticated
 		const { id } = req.user;
-		const userToSend = await User.findById(id)
+
+		// Find the user and populate followers / following
+		const user = await User.findById(id)
 			.populate('followers', 'displayName')
 			.populate('following', 'displayName');
 
-		if (!userToSend) {
+		if (!user) {
 			throw new Error('User does not exist.');
 		}
 
-		res.status(200).send({ success: true, data: userToSend });
+		return res.status(200).send({ success: true, data: user });
 	} catch (error) {
 		next({ status: 404, message: error.message });
 	}
@@ -113,32 +143,29 @@ const getUserProfile = async (req, res, next) => {
 // HEADERS   - { 'authorization': 'Bearer TOKEN' }
 // BODY      - { username, displayName, email, password}
 // PROTECTED - true
+// TODO - New password should be a different endpoint
 const updateUser = async (req, res, next) => {
 	try {
+		// User ID will be in the req if the user is authenticated
 		const { id } = req.user;
 
-		const user = await User.findById(id).select('+password');
-
-		if (!user) {
-			throw new Error('Invalid login credentials');
-		}
-
-		const isValid = await comparePassword(req.body.password, user.password);
+		// Validate Password
+		const isValid = await validatePassword(id, req.body.password);
 
 		if (!isValid) {
-			throw new Error('Incorrect password');
+			throw new Error('Validation failed, unable to update user');
 		}
 
-		// TODO - New password should be a different endpoint
-		const userToUpdate = await User.findByIdAndUpdate(id, req.body, {
+		// Update the user, passing in the req.body - which will contain the keys to update
+		const user = await User.findByIdAndUpdate(id, req.body, {
 			new: true,
 		});
 
-		if (!userToUpdate) {
+		if (!user) {
 			throw new Error('User does not exist');
 		}
 
-		res.status(200).send({ success: true, data: userToUpdate });
+		return res.status(200).send({ success: true, data: user });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -150,17 +177,25 @@ const updateUser = async (req, res, next) => {
 // PROTECTED - true
 const deleteUser = async (req, res, next) => {
 	try {
+		// User ID will be in the req if the user is authenticated
 		const { id } = req.user;
 
-		let userToDelete = await User.findByIdAndDelete(id);
+		// Validate Password
+		const isValid = await validatePassword(id, req.body.password);
 
-		if (!userToDelete) {
+		if (!isValid) {
+			throw new Error('Validation failed, unable to delete user');
+		}
+
+		let user = await User.findByIdAndDelete(id);
+
+		if (!user) {
 			throw new Error('User does not exist.');
 		}
 
 		res.status(200).send({
 			success: true,
-			data: `${userToDelete.displayName}'s account has successfully been deleted.`,
+			data: `${user.displayName}'s account has successfully been deleted.`,
 		});
 	} catch (error) {
 		next({ status: 400, message: error.message });
