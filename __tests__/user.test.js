@@ -27,6 +27,9 @@ afterEach((done) => {
 const ENDPOINT = '/api/users';
 
 describe('USERS', () => {
+	// METHOD    - POST
+	// ENDPOINT  - /api/users
+	// BODY      - { username, displayName, email, password }
 	describe('POST /api/users', () => {
 		it('should return a status of 201 and the new user, with a hashed password', () => {
 			const user = {
@@ -105,6 +108,9 @@ describe('USERS', () => {
 		});
 	});
 
+	// METHOD    - POST
+	// ENDPOINT  - /api/users/login
+	// BODY      - { email, password }
 	describe('POST /api/users/login', () => {
 		it('should return a status of 200 and a jwt when given the correct email and password', () => {
 			const user = {
@@ -154,6 +160,85 @@ describe('USERS', () => {
 		});
 	});
 
+	// METHOD    - GET
+	// ENDPOINT  - /api/users
+	describe('GET /api/users', () => {
+		it('should return a status code of 200 and an array of all users', () => {
+			return request(app)
+				.get(`${ENDPOINT}`)
+				.expect(200)
+				.then((res) => {
+					expect(res.body.success).toBe(true);
+					expect(res.body.data.length).toBe(2);
+				});
+		});
+	});
+
+	// METHOD    - GET
+	// ENDPOINT  - /api/users/:id
+	// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+	// PROTECTED - true
+	describe('GET /api/users/:id', () => {
+		it('should return a status code of 200 and the user matching the given id', async () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password',
+			};
+
+			const loginResponse = await request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user);
+
+			const userToken = loginResponse.body.data;
+			const res = await request(app).get(`${ENDPOINT}`);
+
+			return request(app)
+				.get(`${ENDPOINT}/${res.body.data[1]._id}`)
+				.set('Authorization', `Bearer ${userToken}`)
+				.expect(200)
+				.then((res) => {
+					expect(res.body.success).toBe(true);
+					expect(res.body.data.username).toEqual('Adam');
+				});
+		});
+
+		it('should return a status code of 400 when provided invalid user id', async () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password',
+			};
+
+			const loginResponse = await request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user);
+
+			const userToken = loginResponse.body.data;
+
+			return request(app)
+				.get(`${ENDPOINT}/63efad0430cca9fab0c253c8`)
+				.set('Authorization', `Bearer ${userToken}`)
+				.expect(400)
+				.then((res) => {
+					expect(res.body.success).toBe(false);
+					expect(res.body.data).toEqual('User not found');
+				});
+		});
+
+		it('should return a status code of 401 when not authorized', async () => {
+			return request(app)
+				.get(`${ENDPOINT}/akdjakdj`)
+				.expect(401)
+				.then((res) => {
+					expect(res.body.success).toBe(false);
+					expect(res.body.data).toEqual('Not authorized. No token');
+				});
+		});
+	});
+
+	// METHOD    - GET
+	// ENDPOINT  - /api/users/profile
+	// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+	// PROTECTED - true
 	describe('GET /api/users/profile', () => {
 		it('should return a status code of 200 and the users profile when presented with a valid JWT', async () => {
 			const user = {
@@ -164,6 +249,7 @@ describe('USERS', () => {
 			const loginResponse = await request(app)
 				.post(`${ENDPOINT}/login`)
 				.send(user);
+
 			const userToken = loginResponse.body.data;
 
 			return request(app)
@@ -211,6 +297,11 @@ describe('USERS', () => {
 		});
 	});
 
+	// METHOD    - PUT
+	// ENDPOINT  - /api/users/profile
+	// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+	// BODY      - { username, displayName, email, password}
+	// PROTECTED - true
 	describe('PUT /api/users/profile', () => {
 		// TODO - Add testing for duplicate keys - like changing your email to one that already exists. update password will be a different endpoint
 		it('should return a status code of 200 and the updated user when given the correct password', async () => {
@@ -276,6 +367,10 @@ describe('USERS', () => {
 		});
 	});
 
+	// METHOD    - DELETE
+	// ENDPOINT  - /api/users/profile
+	// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+	// PROTECTED - true
 	describe('DELETE /api/users/profile', () => {
 		it('should return a status code of 200 when successfully deleting a user', async () => {
 			const user = {
@@ -310,6 +405,11 @@ describe('USERS', () => {
 		});
 	});
 
+	// METHOD    - GET
+	// ENDPOINT  - /api/users/:id/follow
+	// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+	// PARAMS    - :id -> User ObjectID
+	// PROTECTED - true
 	describe('GET /api/users/:id/follow', () => {
 		it('should return a status code of 200 and a success message when successful follow is created', async () => {
 			const followingUser = {
@@ -371,6 +471,11 @@ describe('USERS', () => {
 		});
 	});
 
+	// METHOD    - GET
+	// ENDPOINT  - /api/users/:id/unfollow
+	// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+	// PARAMS    - :id -> User ObjectID
+	// PROTECTED - true
 	describe('GET /api/users/:id/unfollow', () => {
 		it('should return a status code of 200 and a success message when successful unfollow is complete', async () => {
 			const unFollowingUser = {

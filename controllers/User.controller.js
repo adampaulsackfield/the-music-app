@@ -6,7 +6,6 @@ const User = require('../models/User.model');
 // METHOD    - POST
 // ENDPOINT  - /api/users
 // BODY      - { username, displayName, email, password }
-// PROTECTED - false
 const createUser = async (req, res, next) => {
 	try {
 		if (
@@ -59,12 +58,30 @@ const loginUser = async (req, res, next) => {
 
 // METHOD    - GET
 // ENDPOINT  - /api/users
-// PROTECTED - false
 // TODO Should this be protected
 const getUsers = async (req, res, next) => {
 	try {
-		let allUsers = await User.find();
+		const allUsers = await User.find();
 		res.status(200).send({ success: true, data: allUsers });
+	} catch (error) {
+		next({ status: 400, message: error.message });
+	}
+};
+
+// METHOD    - GET
+// ENDPOINT  - /api/users/:id
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PROTECTED - true
+const getUserById = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const user = await User.findById(id);
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		res.status(200).send({ success: true, data: user });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -215,6 +232,7 @@ const unfollowUser = async (req, res, next) => {
 module.exports = {
 	createUser,
 	getUsers,
+	getUserById,
 	getUserProfile,
 	updateUser,
 	deleteUser,
