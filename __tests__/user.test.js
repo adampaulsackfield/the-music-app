@@ -212,8 +212,8 @@ describe('USERS', () => {
 	});
 
 	describe('PUT /api/users/profile', () => {
-		// TODO - Add testing for duplicate keys - like changing your email to one that already exists.
-		it('should return a status code of 200 and the updated user when successful', async () => {
+		// TODO - Add testing for duplicate keys - like changing your email to one that already exists. update password will be a different endpoint
+		it('should return a status code of 200 and the updated user when given the correct password', async () => {
 			const user = {
 				email: 'constantin@example.com',
 				password: 'password',
@@ -225,6 +225,7 @@ describe('USERS', () => {
 
 			const updatedUser = {
 				displayName: 'Updated Name',
+				password: 'password',
 			};
 
 			return request(app)
@@ -232,9 +233,35 @@ describe('USERS', () => {
 				.set('Authorization', `Bearer ${loginResponse.body.data}`)
 				.send(updatedUser)
 				.expect(200)
-				.then(async (res) => {
+				.then((res) => {
 					expect(res.body.success).toBe(true);
 					expect(res.body.data.displayName).toEqual(updatedUser.displayName);
+				});
+		});
+
+		it('should return a status code of 400 when given the incorrect password', async () => {
+			const user = {
+				email: 'constantin@example.com',
+				password: 'password',
+			};
+
+			const loginResponse = await request(app)
+				.post(`${ENDPOINT}/login`)
+				.send(user);
+
+			const updatedUser = {
+				displayName: 'Updated Name',
+				password: 'wrong',
+			};
+
+			return request(app)
+				.put(`${ENDPOINT}/profile`)
+				.set('Authorization', `Bearer ${loginResponse.body.data}`)
+				.send(updatedUser)
+				.expect(400)
+				.then((res) => {
+					expect(res.body.success).toBe(false);
+					expect(res.body.data).toEqual('Incorrect password');
 				});
 		});
 

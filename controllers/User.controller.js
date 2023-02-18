@@ -49,7 +49,7 @@ const loginUser = async (req, res, next) => {
 			throw new Error('Invalid login credentials');
 		}
 
-		const token = await generateToken(potentialUser.id); // TODO - Possibly check for token creation failure and send back message
+		const token = await generateToken(potentialUser.id);
 
 		return res.status(200).send({ success: true, data: token });
 	} catch (error) {
@@ -100,13 +100,25 @@ const updateUser = async (req, res, next) => {
 	try {
 		const { id } = req.user;
 
-		// TODO - Confirm password when updating, using compare function
+		const user = await User.findById(id).select('+password');
+
+		if (!user) {
+			throw new Error('Invalid login credentials');
+		}
+
+		const isValid = await comparePassword(req.body.password, user.password);
+
+		if (!isValid) {
+			throw new Error('Incorrect password');
+		}
+
+		// TODO - New password should be a different endpoint
 		const userToUpdate = await User.findByIdAndUpdate(id, req.body, {
 			new: true,
 		});
 
 		if (!userToUpdate) {
-			throw new Error('User does not exist.');
+			throw new Error('User does not exist');
 		}
 
 		res.status(200).send({ success: true, data: userToUpdate });
@@ -129,12 +141,10 @@ const deleteUser = async (req, res, next) => {
 			throw new Error('User does not exist.');
 		}
 
-		res
-			.status(200)
-			.send({
-				success: true,
-				data: `${userToDelete.displayName}'s account has successfully been deleted.`,
-			});
+		res.status(200).send({
+			success: true,
+			data: `${userToDelete.displayName}'s account has successfully been deleted.`,
+		});
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
