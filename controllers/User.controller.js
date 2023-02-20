@@ -1,12 +1,33 @@
+// Helpers
 const comparePassword = require('../helpers/compare-password');
 const generateToken = require('../helpers/generate-jwt');
 const hashPassword = require('../helpers/hash-password');
+
+// Models
 const User = require('../models/User.model');
+
+// Validate Password Helper
+const validatePassword = async (userId, candidatePassword) => {
+	// Find User By ID - So we can get the password to compare
+	const user = await User.findById(userId).select('+password');
+
+	if (!user) {
+		return false;
+	}
+
+	// Verify Password
+	const isValid = await comparePassword(candidatePassword, user.password);
+
+	if (!isValid) {
+		return false;
+	}
+
+	return true;
+};
 
 // METHOD    - POST
 // ENDPOINT  - /api/users
 // BODY      - { username, displayName, email, password }
-// PROTECTED - false
 const createUser = async (req, res, next) => {
 	try {
 		if (
@@ -18,13 +39,14 @@ const createUser = async (req, res, next) => {
 			throw new Error('Missing required fields');
 		}
 
-		let newUser = req.body;
+		let user = req.body;
 
-		newUser.password = await hashPassword(newUser.password);
+		// Hash Password
+		user.password = await hashPassword(user.password);
 
-		let savedUser = await User.create(newUser);
+		const savedUser = await User.create(user);
 
-		res.status(201).send({ success: true, data: savedUser });
+		return res.status(201).send({ success: true, data: savedUser });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -37,19 +59,22 @@ const loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 
-		const potentialUser = await User.findOne({ email }).select('+password');
+		// Find User By Email - Need to select the password, as it doesn't return by default
+		const user = await User.findOne({ email }).select('+password');
 
-		if (!potentialUser) {
+		if (!user) {
 			throw new Error('Invalid login credentials');
 		}
 
-		const isValid = await comparePassword(password, potentialUser.password);
+		// Verify Password
+		const isValid = await comparePassword(password, user.password);
 
 		if (!isValid) {
 			throw new Error('Invalid login credentials');
 		}
 
-		const token = await generateToken(potentialUser.id); // TODO - Possibly check for token creation failure and send back message
+		// Generate JWT
+		const token = await generateToken(user.id);
 
 		return res.status(200).send({ success: true, data: token });
 	} catch (error) {
@@ -59,12 +84,31 @@ const loginUser = async (req, res, next) => {
 
 // METHOD    - GET
 // ENDPOINT  - /api/users
-// PROTECTED - false
 // TODO Should this be protected
 const getUsers = async (req, res, next) => {
 	try {
-		let allUsers = await User.find();
-		res.status(200).send({ success: true, data: allUsers });
+		const users = await User.find();
+
+		return res.status(200).send({ success: true, data: users });
+	} catch (error) {
+		next({ status: 400, message: error.message });
+	}
+};
+
+// METHOD    - GET
+// ENDPOINT  - /api/users/:id
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PROTECTED - true
+const getUserById = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const user = await User.findById(id);
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		return res.status(200).send({ success: true, data: user });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -76,16 +120,19 @@ const getUsers = async (req, res, next) => {
 // PROTECTED - true
 const getUserProfile = async (req, res, next) => {
 	try {
+		// User ID will be in the req if the user is authenticated
 		const { id } = req.user;
-		const userToSend = await User.findById(id)
-		.populate('followers', 'displayName').populate('following', 'displayName');
-		
 
-		if (!userToSend) {
+		// Find the user and populate followers / following
+		const user = await User.findById(id)
+			.populate('followers', 'displayName')
+			.populate('following', 'displayName');
+
+		if (!user) {
 			throw new Error('User does not exist.');
 		}
 
-		res.status(200).send({ success: true, data: userToSend });
+		return res.status(200).send({ success: true, data: user });
 	} catch (error) {
 		next({ status: 404, message: error.message });
 	}
@@ -96,30 +143,29 @@ const getUserProfile = async (req, res, next) => {
 // HEADERS   - { 'authorization': 'Bearer TOKEN' }
 // BODY      - { username, displayName, email, password}
 // PROTECTED - true
+// TODO - New password should be a different endpoint
 const updateUser = async (req, res, next) => {
 	try {
+		// User ID will be in the req if the user is authenticated
 		const { id } = req.user;
-		const { username, password, email, displayName } = req.body;
 
-		const user = await User.findById(id);
+		// Validate Password
+		const isValid = await validatePassword(id, req.body.password);
 
-		// TODO - Confirm password when updating, using compare function
-		const updatedUser = {
-			username: username == null ? user.username : username,
-			email: email == null ? user.email : email,
-			displayname: displayName == null ? user.displayName : displayName,
-			password: password == null ? user.password : password,
-		};
-
-		const userToUpdate = await User.findByIdAndUpdate(id, updatedUser, {
-			returnOriginal: false,
-		});
-
-		if (!userToUpdate) {
-			throw new Error('User does not exist.');
+		if (!isValid) {
+			throw new Error('Validation failed, unable to update user');
 		}
 
-		res.status(200).send({ success: true, data: userToUpdate });
+		// Update the user, passing in the req.body - which will contain the keys to update
+		const user = await User.findByIdAndUpdate(id, req.body, {
+			new: true,
+		});
+
+		if (!user) {
+			throw new Error('User does not exist');
+		}
+
+		return res.status(200).send({ success: true, data: user });
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
@@ -131,54 +177,101 @@ const updateUser = async (req, res, next) => {
 // PROTECTED - true
 const deleteUser = async (req, res, next) => {
 	try {
+		// User ID will be in the req if the user is authenticated
 		const { id } = req.user;
 
-		let userToDelete = await User.findByIdAndDelete(id);
+		// Validate Password
+		const isValid = await validatePassword(id, req.body.password);
 
-		if (!userToDelete) {
+		if (!isValid) {
+			throw new Error('Validation failed, unable to delete user');
+		}
+
+		let user = await User.findByIdAndDelete(id);
+
+		if (!user) {
 			throw new Error('User does not exist.');
 		}
 
-		res.status(200).send({ success: true, data: userToDelete });
+		res.status(200).send({
+			success: true,
+			data: `${user.displayName}'s account has successfully been deleted.`,
+		});
 	} catch (error) {
 		next({ status: 400, message: error.message });
 	}
 };
 
-const followUser = async(req, res, next) =>{
-	try{
+// METHOD    - GET
+// ENDPOINT  - /api/users/:id/follow
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PARAMS    - :id -> User ObjectID
+// PROTECTED - true
+const followUser = async (req, res, next) => {
+	try {
 		const followerID = req.user.id;
 		const followingID = req.params.id;
-		
-		const follower = await User.findByIdAndUpdate(followerID, {$addToSet: {following: followingID}});
-		const followee = await User.findByIdAndUpdate(followingID, {$addToSet:{followers: followerID}});
-		res.status(200).send({success: true, data: {follower, followee}});
 
-	} catch (error){
-		next({status: 400, message: error.message});
+		const follower = await User.findByIdAndUpdate(followerID, {
+			$addToSet: { following: followingID },
+		});
+
+		const followee = await User.findByIdAndUpdate(followingID, {
+			$addToSet: { followers: followerID },
+		});
+
+		if (!follower || !followee) {
+			throw new Error('Something went wrong with the follow request');
+		}
+
+		res.status(200).send({
+			success: true,
+			data: `${followee.displayName} has been followed`,
+		});
+	} catch (error) {
+		next({ status: 400, message: error.message });
 	}
-}
+};
 
-const unfollowUser = async(req, res, next) =>{
-	try{
+// METHOD    - GET
+// ENDPOINT  - /api/users/:id/unfollow
+// HEADERS   - { 'authorization': 'Bearer TOKEN' }
+// PARAMS    - :id -> User ObjectID
+// PROTECTED - true
+const unfollowUser = async (req, res, next) => {
+	try {
 		const unfollowerID = req.user.id;
 		const unfollowingID = req.params.id;
-		
-		const unfollower = await User.findByIdAndUpdate(unfollowerID, {$pull:{following: unfollowingID}});
-		const unfollowee = await User.findByIdAndUpdate(unfollowingID, {$pull:{followers: unfollowerID}});
-		res.status(200).send({success: true, data: `${unfollowee.displayName} has been unfollowed`});
-	} catch (error){
-		next({status: 400, message: error.message});
+
+		const unfollower = await User.findByIdAndUpdate(unfollowerID, {
+			$pull: { following: unfollowingID },
+		});
+
+		const unfollowee = await User.findByIdAndUpdate(unfollowingID, {
+			$pull: { followers: unfollowerID },
+		});
+
+		if (!unfollower || !unfollowee) {
+			throw new Error('Something went wrong with the unfollow request');
+		}
+
+		res.status(200).send({
+			success: true,
+			data: `${unfollowee.displayName} has been unfollowed`,
+		});
+	} catch (error) {
+		next({ status: 400, message: error.message });
 	}
-}
+};
 
 module.exports = {
 	createUser,
 	getUsers,
+	getUserById,
 	getUserProfile,
 	updateUser,
 	deleteUser,
 	loginUser,
 	followUser,
-	unfollowUser
+	unfollowUser,
 };
