@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./database/connection');
+const spotifyApi = require('./services/Spotify.service');
 
 const app = express();
 
