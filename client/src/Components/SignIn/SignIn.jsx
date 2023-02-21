@@ -1,13 +1,8 @@
-import React, { ReactElement } from 'react'
-// Components
-
 // Styles
-import styles from './SignIn.scss'
+import './SignIn.scss';
 
 const SignIn = () => {
-
   return <div>SignIn</div>;
-
 };
 
-export default SignIn
+export default SignIn;

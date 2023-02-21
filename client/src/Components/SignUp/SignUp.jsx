@@ -1,13 +1,7 @@
-import React, { ReactElement } from 'react'
-// Components
-
-// Styles
-import styles from './SignUp.scss'
+import './SignUp.scss';
 
 const SignUp = () => {
-
-  return <div>SignUp</div>;
-
+  return <div>SignUp Page</div>;
 };
 
-export default SignUp
+export default SignUp;
