@@ -1,22 +1,36 @@
 const fs = require('fs');
-const { request } = require('http');
 
-const endpoints = fs.readFileSync('./Music App.postman_collection.json');
+// Read JSON file
+const data = fs.readFileSync('./Music App.postman_collection.json');
 
-const json = JSON.parse(endpoints);
+// Parse JSON data
+const jsonData = JSON.parse(data);
 
-const result = json.item[0].item.forEach((endpoint) => {
-	console.log('Name: ', endpoint.name);
-	console.log('Method: ', endpoint.request.method);
-	console.log('Headers: ', endpoint.request.header);
+// Initialize Markdown content
+let mdContent = '# API Endpoints\n';
 
-	if (endpoint.request.body.raw !== '') {
-		const jsonObject = {
-			...endpoint.request.body,
-			raw: JSON.parse(endpoint.request.body.raw),
-		};
-
-		console.log('Body: ', jsonObject);
-		console.log('URL: ', endpoint.request.url);
-	}
+// Extract data from each endpoint and add to Markdown content
+jsonData.item.forEach((endpoint) => {
+	mdContent += `\n## ${endpoint.name}\n\n`;
+	endpoint.item.forEach((subEndpoint) => {
+		mdContent += `### ${subEndpoint.name}\n\n`;
+		mdContent += `**Method:** \`${subEndpoint.request.method}\`\n\n`;
+		mdContent += `**URL:** \`${subEndpoint.request.url.raw}\`\n\n`;
+		if (subEndpoint.request.body && subEndpoint.request.body.raw) {
+			mdContent += `**Body:**\n\n\`\`\`\n${subEndpoint.request.body.raw}\n\`\`\`\n\n`;
+		}
+		if (subEndpoint.request.header && subEndpoint.request.header.length > 0) {
+			mdContent += `**Headers:**\n\n`;
+			subEndpoint.request.header.forEach((header) => {
+				mdContent += `- ${header.key}: ${header.value}\n`;
+			});
+			mdContent += '\n';
+		}
+		if (subEndpoint.request.auth && subEndpoint.request.auth.bearer) {
+			mdContent += `**Bearer Token:**\n\n\`\`\`\n${subEndpoint.request.auth.bearer[0].value}\n\`\`\`\n\n`;
+		}
+	});
 });
+
+// Write Markdown content to file
+fs.writeFileSync('endpoints.md', mdContent);
