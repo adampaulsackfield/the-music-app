@@ -1,8 +1,64 @@
-// Styles
-import './SignIn.scss';
+import "./SignIn.scss";
+import { useState, useContext } from "react";
+import { loginUser } from "../../services/User.service";
+import { TokenContext } from "../../context/Token.Context";
 
+const initialState = {
+  email: "",
+  password: "",
+};
 const SignIn = () => {
-  return <div>SignIn</div>;
+  const [formData, setFormData] = useState(initialState);
+  const { setToken } = useContext(TokenContext);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (formData.email === "" || formData.password === "") {
+      return console.log("errorHandler");
+    }
+
+    const response = await loginUser(formData);
+    if (response.success) {
+      localStorage.setItem("token", response.data);
+      setToken(response.data);
+    }
+    setFormData(initialState);
+    console.log(response);
+  };
+
+  const handleInputChange = (event) => {
+    setFormData((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  return (
+    <div>
+      <form action="">
+        <p>Sign up</p>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={(e) => handleInputChange(e)}
+          className="SignIn-input"
+          placeholder="Email"
+        />
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={(e) => handleInputChange(e)}
+          className="SignIn-input"
+          placeholder="Password"
+        />
+
+        <button className="SignIn-button" onClick={handleSubmit}>
+          Sign In
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default SignIn;
