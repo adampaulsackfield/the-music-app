@@ -24,10 +24,8 @@
 							}
 						},
 						"url": {
-							"raw": "{{usersURL}}",
-							"host": [
-								"{{usersURL}}"
-							]
+							"raw": "localhost:5550/api/users",
+							"host": ["localhost:5550/api/users"]
 						}
 					},
 					"response": []
@@ -42,7 +40,7 @@
 									"var jsonData = JSON.parse(responseBody);",
 									"",
 									"jsonData.data.forEach(user => {",
-									"    pm.environment.set(`\"${user.username}\"`, user._id);",
+									"    pm.environment.set(user.username, user._id);",
 									"})"
 								],
 								"type": "text/javascript"
@@ -58,7 +56,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzZWU0NmQ5YjdlMDRlOTEwYzNjZjM2MCIsImlhdCI6MTY3NjYzMjk3NywiZXhwIjoxNjc5MjI0OTc3fQ.PeV275_25aNpBVH9kAQO7THdQq6OIYzt9jn0u37E5ZM",
+									"value": "{{sessionToken}}",
 									"type": "string"
 								}
 							]
@@ -70,10 +68,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{usersURL}}",
-							"host": [
-								"{{usersURL}}"
-							]
+							"raw": "localhost:5550/api/users",
+							"host": ["localhost:5550/api/users"]
 						}
 					},
 					"response": []
@@ -101,14 +97,9 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{usersURL}}/profile/",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								"profile",
-								""
-							]
+							"raw": "localhost:5550/api/users/profile/",
+							"host": ["localhost:5550/api/users"],
+							"path": ["profile", ""]
 						}
 					},
 					"response": []
@@ -138,13 +129,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{usersURL}}/profile",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								"profile"
-							]
+							"raw": "localhost:5550/api/users/profile",
+							"host": ["localhost:5550/api/users"],
+							"path": ["profile"]
 						}
 					},
 					"response": []
@@ -174,13 +161,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{usersURL}}/profile",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								"profile"
-							]
+							"raw": "localhost:5550/api/users/profile",
+							"host": ["localhost:5550/api/users"],
+							"path": ["profile"]
 						}
 					},
 					"response": []
@@ -212,13 +195,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{usersURL}}/login",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								"login"
-							]
+							"raw": "localhost:5550/api/users/login",
+							"host": ["localhost:5550/api/users"],
+							"path": ["login"]
 						}
 					},
 					"response": []
@@ -239,14 +218,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{usersURL}}/{{\"Spongebob\"}}/unfollow",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								"{{\"Spongebob\"}}",
-								"unfollow"
-							]
+							"raw": "localhost:5550/api/users/63f11676bfb8f272cc4904f0/unfollow",
+							"host": ["localhost:5550/api/users"],
+							"path": ["63f11676bfb8f272cc4904f0", "unfollow"]
 						}
 					},
 					"response": []
@@ -267,14 +241,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{usersURL}}/{{\"Spongebob\"}}/follow",
-							"host": [
-								"{{usersURL}}"
-							],
-							"path": [
-								"{{\"Spongebob\"}}",
-								"follow"
-							]
+							"raw": "localhost:5550/api/users/63f11676bfb8f272cc4904f0/follow",
+							"host": ["localhost:5550/api/users"],
+							"path": ["63f11676bfb8f272cc4904f0", "follow"]
 						}
 					},
 					"response": []
@@ -290,13 +259,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseURL}}/healthcheck",
-							"host": [
-								"{{baseURL}}"
-							],
-							"path": [
-								"healthcheck"
-							]
+							"raw": "localhost:5550/healthcheck",
+							"host": ["localhost:5550"],
+							"path": ["healthcheck"]
 						}
 					},
 					"response": []

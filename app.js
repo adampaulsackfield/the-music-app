@@ -7,7 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./database/connection');
-const spotifyApi = require('./services/Spotify.service');
+const spotifyRouter = require('./routes/Spotify.routes');
 
 const app = express();
 
@@ -23,6 +23,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Routing User
 app.use('/api/users', userRouter);
+app.use('/api/spotify', spotifyRouter);
 
 app.get('/healthcheck', (req, res) => {
 	res.send('API IS RUNNING');
