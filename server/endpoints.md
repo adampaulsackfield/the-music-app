@@ -12,12 +12,12 @@
 
 **Body:**
 
-```
+```json
 {
-    "username": "Spongebob",
-    "displayName": "SpongeBob Squarepants",
-    "email": "sbsp@example.com",
-    "password":"password"
+  "username": "Spongebob",
+  "displayName": "SpongeBob Squarepants",
+  "email": "sbsp@example.com",
+  "password": "password"
 }
 ```
 
@@ -29,7 +29,7 @@
 
 **Bearer Token:**
 
-```
+```json
 {{sessionToken}}
 ```
 
@@ -41,7 +41,7 @@
 
 **Bearer Token:**
 
-```
+```json
 {{sessionToken}}
 ```
 
@@ -53,16 +53,16 @@
 
 **Body:**
 
-```
+```json
 {
-    "displayName": "Adam",
-    "password": "password"
+  "displayName": "Adam",
+  "password": "password"
 }
 ```
 
 **Bearer Token:**
 
-```
+```json
 {{sessionToken}}
 ```
 
@@ -74,7 +74,7 @@
 
 **Bearer Token:**
 
-```
+```json
 {{sessionToken}}
 ```
 
@@ -86,10 +86,10 @@
 
 **Body:**
 
-```
+```json
 {
-    "email": "sbsp@example.com",
-    "password": "password"
+  "email": "sbsp@example.com",
+  "password": "password"
 }
 ```
 
@@ -101,7 +101,7 @@
 
 **Bearer Token:**
 
-```
+```json
 {{sessionToken}}
 ```
 
@@ -113,7 +113,7 @@
 
 **Bearer Token:**
 
-```
+```json
 {{sessionToken}}
 ```
 
