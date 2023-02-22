@@ -2,6 +2,10 @@ import "./SignUp.scss";
 import { useState } from "react";
 import { registerUser } from "../../services/User.service";
 import { Link } from "react-router-dom";
+import "./SignUp.scss";
+import { useState } from "react";
+import { registerUser } from "../../services/User.service";
+import { toast } from "react-toastify";
 
 const initialState = {
   email: "",
@@ -10,26 +14,35 @@ const initialState = {
   confirmPassword: "",
   displayName: "",
 };
+
 const SignUp = () => {
   const [formData, setFormData] = useState(initialState);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (
       formData.email === "" ||
       formData.password === "" ||
       formData.username === "" ||
       formData.displayName === ""
     ) {
-      return console.log("errorHandler");
+      return toast.warning("Missing required fields");
     }
 
     if (formData.password !== formData.confirmPassword) {
-      return console.log("errorHandler");
+      return toast.warning("Passwords do not match");
     }
 
     const response = await registerUser(formData);
+    if (response.success) {
+      toast.success(
+        `${response.data.username} has successfully registered. Login to continue.`
+      );
+    } else {
+      toast.error(response.data);
+    }
     setFormData(initialState);
-    console.log(response);
   };
 
   const handleInputChange = (event) => {
@@ -51,6 +64,7 @@ const SignUp = () => {
           className="signup_input"
           placeholder="Email"
         />
+
         <input
           type="text"
           name="username"
@@ -59,6 +73,7 @@ const SignUp = () => {
           className="signup_input"
           placeholder="Username"
         />
+
         <input
           type="password"
           name="password"
@@ -67,6 +82,7 @@ const SignUp = () => {
           className="signup_input"
           placeholder="Password"
         />
+
         <input
           type="password"
           name="confirmPassword"
@@ -75,6 +91,7 @@ const SignUp = () => {
           className="signup_input"
           placeholder="Confirm Password"
         />
+
         <input
           type="text"
           name="displayName"
