@@ -1,6 +1,6 @@
 @use "../../assets/sass/variables" as *;
 
-.signup-wrap {
+.singup-wrap {
   display: flex;
   width: 100%;
   min-height: 100vh;
@@ -13,13 +13,14 @@
   background: $platinum;
   padding: 10px;
   width: 50%;
-  height: 50vh;
+  height: 60vh;
   margin: 0 auto;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   text-align: center;
   border-radius: 5%;
+  box-shadow: 5px 5px 10px black;
 
   &_input {
     border: none;
@@ -43,6 +44,13 @@
     font-family: $serif;
     font-weight: 400;
     font-size: 24px;
+  }
+
+  &_anchor {
+    color: $lavender-floral;
+    font-family: $serif;
+    font-weight: 500;
+    margin: 0.5rem;
   }
 }
 

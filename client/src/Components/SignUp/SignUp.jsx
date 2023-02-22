@@ -1,6 +1,7 @@
 import "./SignUp.scss";
 import { useState } from "react";
 import { registerUser } from "../../services/User.service";
+import { Link } from "react-router-dom";
 
 const initialState = {
   email: "",
@@ -82,6 +83,9 @@ const SignUp = () => {
           className="signup_input"
           placeholder="Display Name"
         />
+        <Link to="/signin" className="signup_anchor">
+          Log in
+        </Link>
         <button className="signup_button" onClick={handleSubmit}>
           Sign up
         </button>

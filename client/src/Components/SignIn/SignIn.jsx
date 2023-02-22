@@ -2,6 +2,7 @@ import "./SignIn.scss";
 import { useState, useContext } from "react";
 import { loginUser } from "../../services/User.service";
 import { TokenContext } from "../../context/Token.Context";
+import { Link } from "react-router-dom";
 
 const initialState = {
   email: "",
@@ -52,8 +53,12 @@ const SignIn = () => {
           className="signin_input"
           placeholder="Password"
         />
-        <a className="signin_anchor">Create account</a>
-        <a className="signin_anchor">Forgotten password?</a>
+        <Link to="/signup" className="signin_anchor">
+          Create account
+        </Link>
+        <Link to="/signup" className="signin_anchor">
+          Forgotten password?
+        </Link>
 
         <button className="signin_button" onClick={handleSubmit}>
           Sign In
