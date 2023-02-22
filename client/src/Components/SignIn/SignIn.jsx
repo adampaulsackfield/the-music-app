@@ -1,28 +1,36 @@
-import "./SignIn.scss";
-import { useState, useContext } from "react";
-import { loginUser } from "../../services/User.service";
-import { TokenContext } from "../../context/Token.Context";
+import './SignIn.scss';
+import { useState, useContext } from 'react';
+import { loginUser } from '../../services/User.service';
+import { TokenContext } from '../../context/Token.Context';
+import { toast } from 'react-toastify';
 
 const initialState = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
 };
+
 const SignIn = () => {
   const [formData, setFormData] = useState(initialState);
   const { setToken } = useContext(TokenContext);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (formData.email === "" || formData.password === "") {
-      return console.log("errorHandler");
+
+    if (formData.email === '' || formData.password === '') {
+      return console.log('errorHandler');
     }
 
     const response = await loginUser(formData);
+
     if (response.success) {
-      localStorage.setItem("token", response.data);
+      localStorage.setItem('token', response.data);
       setToken(response.data);
+      toast.success('Login Successful');
+    } else {
+      toast.error(response.data);
     }
+
     setFormData(initialState);
-    console.log(response);
   };
 
   const handleInputChange = (event) => {
@@ -34,26 +42,28 @@ const SignIn = () => {
 
   return (
     <div>
-      <form action="">
+      <form action='' className='SignIn'>
         <p>Sign up</p>
+
         <input
-          type="email"
-          name="email"
+          type='email'
+          name='email'
           value={formData.email}
           onChange={(e) => handleInputChange(e)}
-          className="SignIn-input"
-          placeholder="Email"
-        />
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={(e) => handleInputChange(e)}
-          className="SignIn-input"
-          placeholder="Password"
+          className='SignIn_input'
+          placeholder='Email'
         />
 
-        <button className="SignIn-button" onClick={handleSubmit}>
+        <input
+          type='password'
+          name='password'
+          value={formData.password}
+          onChange={(e) => handleInputChange(e)}
+          className='SignIn-input'
+          placeholder='Password'
+        />
+
+        <button className='SignIn-button' onClick={handleSubmit}>
           Sign In
         </button>
       </form>
