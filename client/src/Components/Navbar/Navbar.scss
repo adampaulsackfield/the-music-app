@@ -1,0 +1,33 @@
+@use '../../assets/sass/variables' as *;
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 32px;
+  background: $night;
+
+  &__logo {
+    font-family: $serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: $raspberry;
+  }
+
+  &__menu {
+    display: flex;
+
+    &-link {
+      // display: none;
+
+      font-family: $sans-serif;
+      color: $lavender-floral;
+
+      &:not(:last-of-type) {
+        padding-right: 12px;
+      }
+    }
+  }
+}

@@ -17,29 +17,46 @@ const Navbar = () => {
     toast.success('Logout Successful');
   };
 
-  return (
-    <div>
-      <nav>
-        <Link to='/'>Home</Link>
+  // TODO - Add active link highlighting
+  // TODO - Add Hamburger React for Mobile menu
 
-        {token ? (
-          <>
-            <Link to='/'>Profile</Link>
-            <Link to='#' onClick={handleLogout}>
-              Logout
-            </Link>
-          </>
-        ) : (
-          <>
-            {/* TODO ! These links should not be visitable when logged in */}
-            <Link to='/signup'>Sign Up</Link>
-            <Link to='/signin'>Sign In</Link>
-          </>
-        )}
+  return (
+    <>
+      <nav className='nav'>
+        <Link className='nav__logo' to='/'>
+          The Music App
+        </Link>
+
+        <section className='nav__menu'>
+          <Link className='nav__menu-link' to='/'>
+            Home
+          </Link>
+
+          {token ? (
+            <>
+              <Link className='nav__menu-link' to='/profile'>
+                Profile
+              </Link>
+              <Link className='nav__menu-link' to='#' onClick={handleLogout}>
+                Logout
+              </Link>
+            </>
+          ) : (
+            <>
+              {/* TODO ! These links should not be visitable when logged in */}
+              <Link className='nav__menu-link' to='/signup'>
+                Sign Up
+              </Link>
+              <Link className='nav__menu-link' to='/signin'>
+                Sign In
+              </Link>
+            </>
+          )}
+        </section>
       </nav>
 
       <Outlet />
-    </div>
+    </>
   );
 };
 
