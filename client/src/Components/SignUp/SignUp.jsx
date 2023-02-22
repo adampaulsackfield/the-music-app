@@ -39,15 +39,15 @@ const SignUp = () => {
   };
 
   return (
-    <div>
-      <form action="">
-        <p>Sign up</p>
+    <div className="singup-wrap">
+      <form className="signup" action="">
+        <p className="signup_header">Sign up</p>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={(e) => handleInputChange(e)}
-          className="signup-input"
+          className="signup_input"
           placeholder="Email"
         />
         <input
@@ -55,7 +55,7 @@ const SignUp = () => {
           name="username"
           value={formData.username}
           onChange={(e) => handleInputChange(e)}
-          className="signup.input"
+          className="signup_input"
           placeholder="Username"
         />
         <input
@@ -63,7 +63,7 @@ const SignUp = () => {
           name="password"
           value={formData.password}
           onChange={(e) => handleInputChange(e)}
-          className="signup-input"
+          className="signup_input"
           placeholder="Password"
         />
         <input
@@ -71,7 +71,7 @@ const SignUp = () => {
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={(e) => handleInputChange(e)}
-          className="signup-input"
+          className="signup_input"
           placeholder="Confirm Password"
         />
         <input
@@ -79,10 +79,10 @@ const SignUp = () => {
           name="displayName"
           value={formData.displayName}
           onChange={(e) => handleInputChange(e)}
-          className="signup-input"
+          className="signup_input"
           placeholder="Display Name"
         />
-        <button className="signup-button" onClick={handleSubmit}>
+        <button className="signup_button" onClick={handleSubmit}>
           Sign up
         </button>
       </form>

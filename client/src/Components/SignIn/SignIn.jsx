@@ -33,15 +33,15 @@ const SignIn = () => {
   };
 
   return (
-    <div>
-      <form action="">
-        <p>Sign up</p>
+    <div className="signin-wrap">
+      <form className="signin" action="">
+        <p className="signin_header">Sign In</p>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={(e) => handleInputChange(e)}
-          className="SignIn-input"
+          className="signin_input"
           placeholder="Email"
         />
         <input
@@ -49,11 +49,13 @@ const SignIn = () => {
           name="password"
           value={formData.password}
           onChange={(e) => handleInputChange(e)}
-          className="SignIn-input"
+          className="signin_input"
           placeholder="Password"
         />
+        <a className="signin_anchor">Create account</a>
+        <a className="signin_anchor">Forgotten password?</a>
 
-        <button className="SignIn-button" onClick={handleSubmit}>
+        <button className="signin_button" onClick={handleSubmit}>
           Sign In
         </button>
       </form>
