@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { spotifyAuth } from "../../services/User.service";
-import "./Home.scss";
+import { useEffect } from 'react';
+import { spotifyAuth } from '../../services/User.service';
+import './Home.scss';
 
 const Home = () => {
   useEffect(() => {
-    spotifyAuth();
+    // spotifyAuth();
   }, []);
   return <div>Home Page</div>;
 };

@@ -21,6 +21,20 @@ export const loginUser = async (user) => {
   }
 };
 
+export const getProfile = async () => {
+  const options = {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+  };
+
+  try {
+    const response = await axios.get(`${URL}/profile`, options);
+
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 export const spotifyAuth = async () => {
   try {
     const options = {

@@ -1,11 +1,11 @@
 // IMPORTS
 import { Link, Outlet } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './Navbar.scss';
 
 // CONTEXT
-import { TokenContext } from '../../context/Token.Context';
+import { TokenContext } from '../../context/Token.context';
 import { useContext } from 'react';
-import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const { token, setToken } = useContext(TokenContext);
