@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+.singup-wrap {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup {
+  display: flex;
+  background: #e6e8e6;
+  padding: 10px;
+  width: 50%;
+  height: 60vh;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  border-radius: 5%;
+  box-shadow: 5px 5px 10px black;
+}
+.signup_input {
+  border: none;
+  margin: 1.5rem;
+  padding: 0.5rem;
+  width: 75%;
+}
+.signup_header {
+  color: black;
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-size: 48px;
+}
+.signup_button {
+  border: none;
+  background-color: #c287e8;
+  width: 20%;
+  height: 10%;
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: 24px;
+}
+.signup_anchor {
+  color: #c287e8;
+  font-family: "Playfair Display", serif;
+  font-weight: 500;
+  margin: 0.5rem;
+}
+
+input::-moz-placeholder {
+  text-align: left;
+  font-family: "Playfair Display", serif;
+}
+
+input::placeholder {
+  text-align: left;
+  font-family: "Playfair Display", serif;
+}/*# sourceMappingURL=SignUp.css.map */

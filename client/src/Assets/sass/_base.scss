@@ -1,0 +1,8 @@
+@use "./variables" as *;
+div {
+  background-color: $space-cadet;
+}
+
+body {
+  min-height: 100vh;
+}

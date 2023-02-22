@@ -1,0 +1,60 @@
+@use "../../assets/sass/variables" as *;
+
+.signin-wrap {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.signin {
+  display: flex;
+  background: $platinum;
+  padding: 10px;
+  width: 50%;
+  height: 50vh;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  border-radius: 5%;
+  box-shadow: 5px 5px 10px black;
+
+  &_input {
+    border: none;
+    margin: 1.5rem;
+    padding: 0.5rem;
+    width: 75%;
+  }
+
+  &_header {
+    color: black;
+    font-family: $sans-serif;
+    font-weight: 400;
+    font-size: 48px;
+  }
+
+  &_button {
+    border: none;
+    background-color: $lavender-floral;
+    width: 20%;
+    height: 10%;
+    font-family: $serif;
+    font-weight: 400;
+    font-size: 24px;
+  }
+
+  &_anchor {
+    color: $lavender-floral;
+    font-family: $serif;
+    font-weight: 500;
+    margin: 0.5rem;
+  }
+}
+
+input::placeholder {
+  text-align: left;
+  font-family: $serif;
+}
