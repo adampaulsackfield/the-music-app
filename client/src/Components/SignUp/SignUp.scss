@@ -1,4 +1,4 @@
-@use "../../assets/sass/variables" as *;
+@use '../../assets/sass/variables' as *;
 
 .singup-wrap {
   display: flex;
@@ -11,16 +11,14 @@
 .signup {
   display: flex;
   background: $platinum;
-  padding: 10px;
+  padding: 60px;
   width: 50%;
   height: 60vh;
-  margin: 0 auto;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  text-align: center;
   border-radius: 5%;
-  box-shadow: 5px 5px 10px black;
+  box-shadow: 5px 5px 10px black 0.5;
 
   &_input {
     border: none;

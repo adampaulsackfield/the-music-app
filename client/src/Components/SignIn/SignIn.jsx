@@ -1,12 +1,18 @@
-import "./SignIn.scss";
-import { useState, useContext } from "react";
-import { loginUser } from "../../services/User.service";
-import { TokenContext } from "../../context/Token.Context";
-import { toast } from "react-toastify";
+// IMPORTS
+import { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import './SignIn.scss';
+
+// SERVICES
+import { loginUser } from '../../services/User.service';
+
+// CONTEXT
+import { TokenContext } from '../../context/Token.Context';
 
 const initialState = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
 };
 
 const SignIn = () => {
@@ -16,16 +22,16 @@ const SignIn = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (formData.email === "" || formData.password === "") {
-      return console.log("errorHandler");
+    if (formData.email === '' || formData.password === '') {
+      return console.log('errorHandler');
     }
 
     const response = await loginUser(formData);
 
     if (response.success) {
-      localStorage.setItem("token", response.data);
+      localStorage.setItem('token', response.data);
       setToken(response.data);
-      toast.success("Login Successful");
+      toast.success('Login Successful');
     } else {
       toast.error(response.data);
     }
@@ -41,35 +47,37 @@ const SignIn = () => {
   };
 
   return (
-    <div>
-      <form action="" className="SignIn">
+    <div className='signin-wrap'>
+      <form action='' className='signin'>
         <p>Sign up</p>
 
         <input
-          type="email"
-          name="email"
+          type='email'
+          name='email'
           value={formData.email}
           onChange={(e) => handleInputChange(e)}
-          className="SignIn_input"
-          placeholder="Email"
+          className='signin_input'
+          placeholder='Email'
         />
-        <Link to="/signup" className="signin_anchor">
+
+        <input
+          type='password'
+          name='password'
+          value={formData.password}
+          onChange={(e) => handleInputChange(e)}
+          className='signin_input'
+          placeholder='Password'
+        />
+
+        <Link to='/signup' className='signin_anchor'>
           Create account
         </Link>
-        <Link to="/signup" className="signin_anchor">
+
+        <Link to='/signup' className='signin_anchor'>
           Forgotten password?
         </Link>
 
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={(e) => handleInputChange(e)}
-          className="SignIn-input"
-          placeholder="Password"
-        />
-
-        <button className="SignIn-button" onClick={handleSubmit}>
+        <button className='signin_button' onClick={handleSubmit}>
           Sign In
         </button>
       </form>
