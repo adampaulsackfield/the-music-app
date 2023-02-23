@@ -1,17 +1,17 @@
 // IMPORTS
-import { useState } from 'react';
-import { toast } from 'react-toastify';
-import './SignUp.scss';
+import { useState } from "react";
+import { toast } from "react-toastify";
+import "./SignUp.scss";
 
 // SERVICES
-import { registerUser } from '../../services/User.service';
+import { registerUser } from "../../services/User.service";
 
 const initialState = {
-  email: '',
-  username: '',
-  password: '',
-  confirmPassword: '',
-  displayName: '',
+  email: "",
+  username: "",
+  password: "",
+  confirmPassword: "",
+  displayName: "",
 };
 
 const SignUp = () => {
@@ -21,16 +21,16 @@ const SignUp = () => {
     event.preventDefault();
 
     if (
-      formData.email === '' ||
-      formData.password === '' ||
-      formData.username === '' ||
-      formData.displayName === ''
+      formData.email === "" ||
+      formData.password === "" ||
+      formData.username === "" ||
+      formData.displayName === ""
     ) {
-      return toast.warning('Missing required fields');
+      return toast.warning("Missing required fields");
     }
 
     if (formData.password !== formData.confirmPassword) {
-      return toast.warning('Passwords do not match');
+      return toast.warning("Passwords do not match");
     }
 
     const response = await registerUser(formData);
@@ -52,55 +52,55 @@ const SignUp = () => {
   };
 
   return (
-    <div className='singup-wrap'>
-      <form className='signup' action=''>
-        <p className='signup_header'>Sign up</p>
+    <div className="singup-wrap">
+      <form className="signup" action="">
+        <p className="signup__header">Sign up</p>
         <input
-          type='email'
-          name='email'
+          type="email"
+          name="email"
           value={formData.email}
           onChange={(e) => handleInputChange(e)}
-          className='signup_input'
-          placeholder='Email'
+          className="signup__input"
+          placeholder="Email"
         />
 
         <input
-          type='text'
-          name='username'
+          type="text"
+          name="username"
           value={formData.username}
           onChange={(e) => handleInputChange(e)}
-          className='signup_input'
-          placeholder='Username'
+          className="signup__input"
+          placeholder="Username"
         />
 
         <input
-          type='password'
-          name='password'
+          type="password"
+          name="password"
           value={formData.password}
           onChange={(e) => handleInputChange(e)}
-          className='signup_input'
-          placeholder='Password'
+          className="signup__input"
+          placeholder="Password"
         />
 
         <input
-          type='password'
-          name='confirmPassword'
+          type="password"
+          name="confirmPassword"
           value={formData.confirmPassword}
           onChange={(e) => handleInputChange(e)}
-          className='signup_input'
-          placeholder='Confirm Password'
+          className="signup__input"
+          placeholder="Confirm Password"
         />
 
         <input
-          type='text'
-          name='displayName'
+          type="text"
+          name="displayName"
           value={formData.displayName}
           onChange={(e) => handleInputChange(e)}
-          className='signup_input'
-          placeholder='Display Name'
+          className="signup__input"
+          placeholder="Display Name"
         />
 
-        <button className='signup_button' onClick={handleSubmit}>
+        <button className="signup__button" onClick={handleSubmit}>
           Sign up
         </button>
       </form>

@@ -1,4 +1,4 @@
-@use '../../assets/sass/variables' as *;
+@use "../../assets/sass/variables" as *;
 
 .singup-wrap {
   display: flex;
@@ -20,21 +20,21 @@
   border-radius: 5%;
   box-shadow: 5px 5px 10px black 0.5;
 
-  &_input {
+  &__input {
     border: none;
     margin: 1.5rem;
     padding: 0.5rem;
     width: 75%;
   }
 
-  &_header {
+  &__header {
     color: black;
     font-family: $sans-serif;
     font-weight: 400;
     font-size: 48px;
   }
 
-  &_button {
+  &__button {
     border: none;
     background-color: $lavender-floral;
     width: 20%;
@@ -44,7 +44,7 @@
     font-size: 24px;
   }
 
-  &_anchor {
+  &__anchor {
     color: $lavender-floral;
     font-family: $serif;
     font-weight: 500;
