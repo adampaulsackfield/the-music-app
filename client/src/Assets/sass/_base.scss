@@ -1,4 +1,7 @@
-@use "./variables" as *;
+@use './variables' as *;
+
+// TODO - Going to need something more specific than div, as it is affecting the notifications and other elements.
+
 div {
   background-color: $space-cadet;
 }
