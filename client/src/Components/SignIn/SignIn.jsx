@@ -1,46 +1,55 @@
 // IMPORTS
-import { useState, useContext } from 'react';
-import { Link, redirect } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import './SignIn.scss';
+import { useState, useContext, useEffect } from "react";
+import { Link, redirect, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "./SignIn.scss";
 
 // SERVICES
-import { loginUser } from '../../services/User.service';
+import { loginUser } from "../../services/User.service";
 
 // CONTEXT
-import { TokenContext } from '../../context/Token.context';
+import { TokenContext } from "../../context/Token.context";
 
 const initialState = {
-  email: '',
-  password: '',
+  email: "",
+  password: "",
 };
 
 const SignIn = () => {
   const [formData, setFormData] = useState(initialState);
-  const { setToken } = useContext(TokenContext);
+  const { setToken, token } = useContext(TokenContext);
+  const navigate = useNavigate();
+  const shouldRedirect = false;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (formData.email === '' || formData.password === '') {
-      return console.log('errorHandler');
+    if (formData.email === "" || formData.password === "") {
+      return console.log("errorHandler");
     }
 
     const response = await loginUser(formData);
 
     if (response.success) {
-      localStorage.setItem('token', response.data);
+      localStorage.setItem("token", response.data);
       setToken(response.data);
-      toast.success('Login Successful');
+      toast.success("Login Successful");
+      shouldRedirect = true;
 
-      // TODO - Redirect isn't working
-      redirect('/profile');
+      // TODO - Redirect still isn't working
+      //redirect("/profile");
     } else {
       toast.error(response.data);
     }
 
     setFormData(initialState);
   };
+
+  useEffect(() => {
+    if (shouldRedirect) {
+      return navigate("/profile");
+    }
+  }, [token]);
 
   const handleInputChange = (event) => {
     setFormData((prev) => ({
@@ -50,37 +59,37 @@ const SignIn = () => {
   };
 
   return (
-    <div className='signin-wrap'>
-      <form action='' className='signin'>
-        <p>Sign up</p>
+    <div className="signin-wrap">
+      <form action="" className="signin">
+        <p className="signin__header">Sign in</p>
 
         <input
-          type='email'
-          name='email'
+          type="email"
+          name="email"
           value={formData.email}
           onChange={(e) => handleInputChange(e)}
-          className='signin_input'
-          placeholder='Email'
+          className="signin__input"
+          placeholder="Email"
         />
 
         <input
-          type='password'
-          name='password'
+          type="password"
+          name="password"
           value={formData.password}
           onChange={(e) => handleInputChange(e)}
-          className='signin_input'
-          placeholder='Password'
+          className="signin__input"
+          placeholder="Password"
         />
 
-        <Link to='/signup' className='signin_anchor'>
+        <Link to="/signup" className="signin__anchor">
           Create account
         </Link>
 
-        <Link to='/signup' className='signin_anchor'>
+        <Link to="/signup" className="signin__anchor">
           Forgotten password?
         </Link>
 
-        <button className='signin_button' onClick={handleSubmit}>
+        <button className="signin__button" onClick={handleSubmit}>
           Sign In
         </button>
       </form>

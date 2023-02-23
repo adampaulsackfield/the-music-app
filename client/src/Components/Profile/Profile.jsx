@@ -1,19 +1,18 @@
 // IMPORTS
-import { useContext, useEffect } from 'react';
-import './Profile.scss';
+import { useContext, useEffect } from "react";
+import "./Profile.scss";
 
 // SERVICES
-import { getProfile } from '../../services/User.service.js';
+import { getProfile } from "../../services/User.service.js";
 
 // CONTEXTS
-import { UserContext } from '../../context/User.context';
-
-// TODO - Ensure only logged in people can view profile
+import { UserContext } from "../../context/User.context";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const { user, setUser } = useContext(UserContext);
-
-  const { username, displayName, email } = user;
+  let shouldRedirect = false;
+  const navigate = useNavigate();
 
   const loadUser = async () => {
     const response = await getProfile();
@@ -21,9 +20,16 @@ const Profile = () => {
     if (response.success) {
       setUser(response.data);
     } else {
-      // TODO - Handle Error
+      // TODO - Have Faith in Constantin's fix.
+      shouldRedirect = true;
     }
   };
+
+  useEffect(() => {
+    if (shouldRedirect) {
+      navigate("/signin");
+    }
+  });
 
   useEffect(() => {
     loadUser();
@@ -33,9 +39,9 @@ const Profile = () => {
     <div>
       {user && (
         <div>
-          <h2>Username: {username}</h2>
-          <h3>Display Name: {displayName}</h3>
-          <h3>Email: {email}</h3>
+          <h2>Username: {user.username}</h2>
+          <h3>Display Name: {user.displayName}</h3>
+          <h3>Email: {user.email}</h3>
         </div>
       )}
     </div>
