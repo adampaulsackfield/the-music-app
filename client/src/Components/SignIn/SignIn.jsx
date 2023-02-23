@@ -1,6 +1,6 @@
 // IMPORTS
 import { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, redirect } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './SignIn.scss';
 
@@ -8,7 +8,7 @@ import './SignIn.scss';
 import { loginUser } from '../../services/User.service';
 
 // CONTEXT
-import { TokenContext } from '../../context/Token.Context';
+import { TokenContext } from '../../context/Token.context';
 
 const initialState = {
   email: '',
@@ -32,6 +32,9 @@ const SignIn = () => {
       localStorage.setItem('token', response.data);
       setToken(response.data);
       toast.success('Login Successful');
+
+      // TODO - Redirect isn't working
+      redirect('/profile');
     } else {
       toast.error(response.data);
     }
