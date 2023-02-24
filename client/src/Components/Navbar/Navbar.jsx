@@ -37,7 +37,7 @@ const Navbar = () => {
     <>
       <nav className="nav">
         <Link className="nav__logo" to="/">
-          The Music App
+          Sonorous App
         </Link>
 
         <section className="nav__menu">

@@ -1,0 +1,38 @@
+@use "../../assets/sass/variables" as *;
+
+.profile-wrap {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  justify-content: center;
+}
+
+.profile__container {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+
+  &__image {
+    display: flex;
+    align-self: center;
+    width: 100px;
+    max-height: 100%;
+    border-radius: 50%;
+  }
+  &__username {
+    font-family: $serif;
+    font-weight: 600;
+    font-size: 24px;
+  }
+  &__display {
+    font-family: $serif;
+    font-weight: 500;
+    font-size: 24px;
+  }
+  &__email {
+    font-family: $serif;
+    font-weight: 400;
+    font-size: 300;
+  }
+}
