@@ -1,0 +1,36 @@
+@use "../../assets/sass/variables" as *;
+
+.editDetails-wrap {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  justify-content: center;
+}
+
+.editDetails__form {
+  display: flex;
+  flex-direction: column;
+  background: $platinum;
+  padding: 60px;
+  width: 100vh;
+  height: 60vh;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 5%;
+  box-shadow: 5px 5px 10px black 0.5;
+
+  &__input {
+    border: none;
+    margin: 1.5rem;
+    padding: 0.5rem;
+    width: 75%;
+  }
+
+  &__label {
+    color: black;
+    font-family: $sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+  }
+}
