@@ -4,9 +4,9 @@ import React, { ReactElement } from "react";
 // Styles
 import styles from "./Button.scss";
 
-const Button = ({ buttonLabel, onClick }) => {
+const Button = ({ buttonLabel, onClick, size }) => {
   return (
-    <button onClick={onClick} className="button__style">
+    <button onClick={onClick} className={`button__style button__style-${size}`}>
       {buttonLabel}
     </button>
   );
