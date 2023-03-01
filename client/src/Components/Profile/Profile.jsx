@@ -58,11 +58,19 @@ const Profile = () => {
           <h2 className="profile__container__username">{user.username}</h2>
           <h3 className="profile__container__display">{user.displayName}</h3>
           <h3 className="profile__container__email">{user.email}</h3>
-          <Button onClick={handleClick} buttonLabel={"Edit"}></Button>
+          <Button
+            onClick={handleClick}
+            buttonLabel={"Edit"}
+            size="small"
+          ></Button>
         </div>
       ) : (
         <div className="">
-          <EditDetails user={user} handleClick={handleClick}></EditDetails>
+          <EditDetails
+            user={user}
+            handleClick={handleClick}
+            setShowEditForm={setShowEditForm}
+          ></EditDetails>
         </div>
       )}
     </div>

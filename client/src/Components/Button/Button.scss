@@ -4,7 +4,6 @@
   border: none;
   background-color: $lavender-floral;
   width: 25%;
-  height: 5%;
   font-family: $serif;
   font-weight: 400;
   font-size: 24px;
@@ -13,4 +12,16 @@
   justify-content: center;
   align-items: center;
   margin-top: 5px;
+
+  &-small {
+    height: 5%;
+  }
+
+  &-medium {
+    height: 10%;
+  }
+
+  &-large {
+    height: 15%;
+  }
 }

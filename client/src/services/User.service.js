@@ -1,10 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 
-const URL = 'http://localhost:5550/api/users';
+const URL = "http://localhost:5550/api/users";
 
 export const registerUser = async (user) => {
   try {
     const response = await axios.post(URL, user);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export const updateUser = async (user) => {
+  const options = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  };
+  try {
+    const response = await axios.put(`${URL}/profile`, user, options);
     return response.data;
   } catch (error) {
     return error.response.data;
@@ -23,7 +35,7 @@ export const loginUser = async (user) => {
 
 export const getProfile = async () => {
   const options = {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   };
 
   try {
@@ -38,15 +50,15 @@ export const getProfile = async () => {
 export const spotifyAuth = async () => {
   try {
     const options = {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     };
 
     const response = await axios.get(
-      'http://localhost:5550/api/spotify/auth',
+      "http://localhost:5550/api/spotify/auth",
       options
     );
-    console.log('response', response);
+    console.log("response", response);
   } catch (error) {
-    console.log('error', error);
+    console.log("error", error);
   }
 };
